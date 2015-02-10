@@ -1,36 +1,34 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
-
-import javax.swing.JColorChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-
-import java.awt.BorderLayout;
-
-import net.miginfocom.swing.MigLayout;
-
-import javax.swing.JScrollPane;
-
-import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.Window.Type;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Hashtable;
 
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JToggleButton;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.JLayeredPane;
-import javax.swing.JSlider;
-import java.awt.Window.Type;
-import javax.swing.SwingConstants;
-import javax.swing.JToggleButton;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import javax.swing.JComboBox;
+
+import net.miginfocom.swing.MigLayout;
+
+import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
+import javax.swing.JCheckBox;
 
 
 public class Editor
@@ -40,9 +38,11 @@ public class Editor
     private Color fillColor;
     private Color borderColor;
     private JColorChooser colorChooser;
-    
     private JSlider opacitySlider;
     private JSlider strokeSlider;
+    private JLayeredPane layeredPane;
+    
+    private ButtonGroup toolGroup;
     
     /**
      * Launch the application.
@@ -56,6 +56,7 @@ public class Editor
                 try
                 {
                     Editor window = new Editor();
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     window.frmEditor.setVisible(true);
                 } catch (Exception e)
                 {
@@ -84,6 +85,8 @@ public class Editor
         frmEditor.setBounds(100, 100, 1280, 720);
         frmEditor.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
+        toolGroup = new ButtonGroup();
+        
         JPanel panel = new JPanel();
         frmEditor.getContentPane().add(panel, BorderLayout.CENTER);
         panel.setLayout(new MigLayout("", "[823.00,grow]", "[82.00][425.00,grow]"));
@@ -110,7 +113,7 @@ public class Editor
         final ColorSelectionPanel fillColorPanel = new ColorSelectionPanel();
         final ColorSelectionPanel borderColorPanel = new ColorSelectionPanel();
         
-        final JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane = new JLayeredPane();
         layeredPane.setBackground(Color.LIGHT_GRAY);
         toolPanel.add(layeredPane, "cell 0 0,grow");
         layeredPane.setLayer(fillColorPanel, 1);
@@ -247,64 +250,95 @@ public class Editor
         JPanel shapePanel = new JPanel();
         shapePanel.setBackground(Color.WHITE);
         shapePanel.setBorder(new TitledBorder(null, "Shapes", TitledBorder.TRAILING, TitledBorder.BOTTOM, null, null));
-        toolPanel.add(shapePanel, "cell 3 0,growy");
-        shapePanel.setLayout(new GridLayout(0, 3, 0, 0));
+        toolPanel.add(shapePanel, "cell 3 0");
+        shapePanel.setLayout(new GridLayout(0, 2, 0, 0));
         
-        JToggleButton toggleButton = new JToggleButton("0");
-        shapePanel.add(toggleButton);
+        JToggleButton lineButton = new JToggleButton();
+        lineButton.setIcon(new ImageIcon(Editor.class.getResource("/resources/line.png")));
+        //lineButton.setBorderPainted(false);
+        //lineButton.setContentAreaFilled(false);
+        toolGroup.add(lineButton);
+        shapePanel.add(lineButton);
         
-        JToggleButton toggleButton_1 = new JToggleButton("1");
-        shapePanel.add(toggleButton_1);
+        JToggleButton rectangleButton = new JToggleButton("");
+        rectangleButton.setIcon(new ImageIcon(Editor.class.getResource("/resources/rectangle.png")));
+        //rectangleButton.setContentAreaFilled(false);
+        //rectangleButton.setContentAreaFilled(false);
+        toolGroup.add(rectangleButton);
+        shapePanel.add(rectangleButton);
         
-        JToggleButton toggleButton_2 = new JToggleButton("2");
-        shapePanel.add(toggleButton_2);
+        JToggleButton roundRectButton = new JToggleButton("");
+        roundRectButton.setIcon(new ImageIcon(Editor.class.getResource("/resources/round_rectangle.png")));
+        //filledRectButton.setContentAreaFilled(false);
+        toolGroup.add(roundRectButton);
+        shapePanel.add(roundRectButton);
         
-        JToggleButton toggleButton_3 = new JToggleButton("3");
-        shapePanel.add(toggleButton_3);
+        JToggleButton ellipseButton = new JToggleButton("");
+        ellipseButton.setIcon(new ImageIcon(Editor.class.getResource("/resources/ellipse.png")));
+        toolGroup.add(ellipseButton);
+        shapePanel.add(ellipseButton);
         
-        JToggleButton toggleButton_4 = new JToggleButton("4");
-        shapePanel.add(toggleButton_4);
-        
-        JToggleButton toggleButton_5 = new JToggleButton("5");
-        shapePanel.add(toggleButton_5);
+        JCheckBox chckbxFilled = new JCheckBox("Filled");
+        chckbxFilled.setBackground(Color.WHITE);
+        toolPanel.add(chckbxFilled, "cell 4 0,grow");
         
         JPanel editingToolsPanel = new JPanel();
         editingToolsPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Tools", TitledBorder.TRAILING, TitledBorder.BOTTOM, null, null));
         editingToolsPanel.setBackground(Color.WHITE);
-        toolPanel.add(editingToolsPanel, "cell 4 0,grow");
+        toolPanel.add(editingToolsPanel, "cell 5 0,grow");
         editingToolsPanel.setLayout(new GridLayout(0, 3, 0, 0));
         
         JToggleButton toggleButton_6 = new JToggleButton("0");
+        toggleButton_6.setEnabled(false);
+        toolGroup.add(toggleButton_6);
         editingToolsPanel.add(toggleButton_6);
         
         JToggleButton toggleButton_7 = new JToggleButton("1");
+        toggleButton_7.setEnabled(false);
+        toolGroup.add(toggleButton_7);
         editingToolsPanel.add(toggleButton_7);
         
         JToggleButton toggleButton_8 = new JToggleButton("2");
+        toggleButton_8.setEnabled(false);
+        toolGroup.add(toggleButton_8);
         editingToolsPanel.add(toggleButton_8);
         
         JToggleButton toggleButton_9 = new JToggleButton("3");
+        toggleButton_9.setEnabled(false);
+        toolGroup.add(toggleButton_9);
         editingToolsPanel.add(toggleButton_9);
         
         JToggleButton toggleButton_10 = new JToggleButton("4");
+        toggleButton_10.setEnabled(false);
+        toolGroup.add(toggleButton_10);
         editingToolsPanel.add(toggleButton_10);
         
         JToggleButton toggleButton_11 = new JToggleButton("5");
+        toggleButton_11.setEnabled(false);
+        toolGroup.add(toggleButton_11);
         editingToolsPanel.add(toggleButton_11);
         
-        JButton btnSelect = new JButton("Select");
-        toolPanel.add(btnSelect, "cell 5 0,grow");
+        JToggleButton btnSelect = new JToggleButton("Select");
+        toolGroup.add(btnSelect);
+        toolPanel.add(btnSelect, "cell 6 0,grow");
         
         JPanel panel_1 = new JPanel();
         panel_1.setBackground(Color.WHITE);
-        toolPanel.add(panel_1, "cell 6 0,grow");
+        toolPanel.add(panel_1, "cell 7 0,grow");
         panel_1.setLayout(new MigLayout("", "[61px]", "[][]"));
         
-        JButton btnUndo = new JButton("Undo");
+        JButton btnUndo = new JButton("");
+        btnUndo.setIcon(new ImageIcon(Editor.class.getResource("/resources/undo.png")));
+        btnUndo.setBackground(Color.WHITE);
         panel_1.add(btnUndo, "cell 0 0,grow");
         
-        JButton btnRedo = new JButton("Redo");
+        JButton btnRedo = new JButton("");
+        btnRedo.setIcon(new ImageIcon(Editor.class.getResource("/resources/redo.png")));
+        btnRedo.setBackground(Color.WHITE);
         panel_1.add(btnRedo, "cell 0 1,grow");
+        
+        JButton btnReset = new JButton("Reset");
+        toolPanel.add(btnReset, "cell 14 0,growy");
         
         JButton btnSubmit = new JButton("Submit");
         toolPanel.add(btnSubmit, "cell 15 0,growy");
@@ -317,6 +351,7 @@ public class Editor
         imageLayer.setBackground(Color.WHITE);
         scrollPane.setViewportView(imageLayer);
         imageLayer.setLayout(new GridLayout(2, 3, 0, 0));
+        
     }
     protected int getOpacitySliderValue()
     {
